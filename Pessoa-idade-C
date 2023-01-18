@@ -1,0 +1,152 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#define TAM 10
+
+typedef struct {
+    char nome[50];
+    int idade;
+} Pessoa;
+
+typedef struct {
+    int topo;
+    Pessoa pessoa[TAM];
+} Pilha;
+
+void inicializarPilha (Pilha *p)
+{
+    p -> topo = -1;
+}
+
+int cheia (Pilha *p)
+{
+    if(p -> topo == TAM -1)
+        return 1;
+    else
+        return 0;
+}
+
+int vazia (Pilha *p)
+{
+    if(p -> topo == -1)
+        return 1;
+    else
+        return 0;
+}
+
+void empilhar(Pilha *p, char nome[50], int idade)
+{
+    if (cheia(p)==1)//se pilha cheia
+        printf("\n --- A PILHA ESTA CHEIA ---\n");
+    else
+    {
+        p -> topo++;
+        setbuf(stdin,NULL);
+        strcpy(p -> pessoa[p -> topo].nome,nome);
+        p -> pessoa[p -> topo].idade = idade;//
+    }
+}
+
+void desempilhar(Pilha *p)
+{
+    if (vazia(p)==1)
+        printf("\n--- PILHA VAZIA ---\n");
+     else
+    {
+        //desempilhar
+        setbuf(stdin,NULL);//limpa
+        strcpy(p -> pessoa[p -> topo].nome,"\0");
+        p -> pessoa[p -> topo].idade = NULL;//
+        p -> topo--;//desce uma posicao
+    }
+}
+
+void exibir(Pilha *p)
+{
+    int posicao = p -> topo;
+    printf("\n PILHA ATUAL \n");
+    if(vazia(p)==1)
+        printf("\n PILHA VAZIA \n");
+    else
+    {
+        while(posicao != -1)
+        {
+            printf("\t%s\t%i\n", p->pessoa[posicao].nome, p->pessoa[posicao].idade);
+            posicao--;
+        }
+    }
+}
+
+void removerItem(Pilha *p, Pilha *pilhaAux, char nome[50])
+{
+    int i = 0;
+    if(vazia(p)==1)
+        printf(">> PILHA VAZIA <<");
+    else
+    {
+            for (i=p->topo; i>=0; i--)
+                if(strcmp(p-> pessoa[i].nome,nome)==0)//comparando nome por parametro e nome da estrutura
+                    break;
+            for(int j=p->topo; j>=1; j--)
+            {
+                if(j>i)
+                    empilhar(pilhaAux, p->pessoa[p->topo].nome,p->pessoa[p->topo].idade);
+                    desempilhar(p);
+            }
+            for(int j = pilhaAux->topo; j>=0; j--)
+            empilhar(p,pilhaAux -> pessoa[j].nome, pilhaAux->pessoa[j].idade);
+    }
+}
+
+int main ()
+{
+    Pilha p;
+    Pilha pilhaAux;
+    int caso;
+    char nome[50];
+    int idade = 0;
+
+    inicializarPilha(&p);
+    inicializarPilha(&pilhaAux);
+
+    do
+    {
+       system("pause");
+       system("cls");
+       exibir(&p);
+
+       printf("* * * MENU * * *\n");
+       printf("1 - EMPILHAR\n");
+       printf("2 - DESEMPILHAR\n");
+       printf("3 - REMOVER PELO NOME \n");
+       printf("0 - SAIR\n");
+       scanf(" %c", &caso);
+        switch (caso)
+        {
+        case '1':
+            printf("Digite o nome da pessoa: \n");
+            setbuf(stdin, NULL);
+            scanf("%[^\n]s", nome);
+            printf("Digite a idade da pessoa: \n");
+            scanf("%i", &idade);
+            empilhar(&p, nome, idade);
+            break;
+        case '2':
+            desempilhar(&p);
+            break;
+        case '3':
+            printf("Digite o nome da pessoa a ser removida: \n ");
+            setbuf(stdin,NULL);
+            scanf("%[^\n]s", &nome);
+            removerItem(&p,&pilhaAux,nome);
+            break;
+        case '0':
+            printf("FIM..");
+            break;
+        default:
+            printf("  Digito invalido  \n");
+            break;
+        }
+    } while (caso != 0);
+        return 0;
+}
